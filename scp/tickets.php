@@ -330,7 +330,18 @@ if($_POST && !$errors):
                         $msg=__('Ticket created successfully');
                         $_REQUEST['a']=null;
                         if (!$ticket->checkStaffPerm($thisstaff) || $ticket->isClosed())
-                            $ticket=null;
+			{
+				if ($ticket->isClosed())
+				{
+					$errors['err'] = "Failed to create ticket, Ticket is closed!";
+				}
+				if (!$ticket->checkStaffPerm($thisstaff))
+				{
+					$errors['err'] = "Failed to create ticket, check staff permissions!";
+				}
+				$msg=null;
+                        	$ticket = null;
+			}
                         Draft::deleteForNamespace('ticket.staff%', $thisstaff->getId());
                         // Drop files from the response attachments widget
                         $response_form->setSource(array());
